@@ -1,10 +1,5 @@
 name: .NET Core
 
-on:
-  push:
-    branches: [ poi-release ]
-  pull_request:
-    branches: [ poi-release ]
 
 jobs:
   build_and_test:
