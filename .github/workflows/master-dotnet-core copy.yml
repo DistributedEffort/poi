@@ -1,0 +1,40 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [master1]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.2.207
+      - name: Add Code Coverage Tools
+        working-directory: tests/UnitTests
+        run: dotnet add package coverlet.msbuild
+
+      - name: Install dependencies
+        run: dotnet restore web/*.csproj
+
+      - name: .NET Build Web
+        run: dotnet build --configuration Release --no-restore web/*.csproj
+
+      - name: .NET Build Unit Tests
+        run: dotnet build --configuration Release tests/UnitTests/UnitTests.csproj
+
+      - name: .NET Test
+        run: dotnet test --no-restore --verbosity normal tests/UnitTests  /p:CollectCoverage=true /p:CoverletOutput=lcov/ /p:CoverletOutputFormat=lcov
+
+      - uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: tests/UnitTests/lcov/coverage.info
+          base-path:
+          flag-name: Unit
