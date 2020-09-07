@@ -2,9 +2,9 @@ name: .NET Core
 
 on:
   push:
-    branches: [poi-release]
+    branches: [master1]
   pull_request:
-    branches: [poi--release]
+    branches: [master1]
 
 jobs:
   build_and_test:
@@ -17,24 +17,24 @@ jobs:
         with:
           dotnet-version: 2.2.207
       - name: Add Code Coverage Tools
-        working-directory: /tests/UnitTests
+        working-directory: tests/UnitTests
         run: dotnet add package coverlet.msbuild
 
       - name: Install dependencies
-        run: dotnet restore /web/*.csproj
+        run: dotnet restore web/*.csproj
 
       - name: .NET Build Web
-        run: dotnet build --configuration Release --no-restore a/web/*.csproj
+        run: dotnet build --configuration Release --no-restore web/*.csproj
 
       - name: .NET Build Unit Tests
-        run: dotnet build --configuration Release /tests/UnitTests/UnitTests.csproj
+        run: dotnet build --configuration Release tests/UnitTests/UnitTests.csproj
 
       - name: .NET Test
-        run: dotnet test --no-restore --verbosity normal /tests/UnitTests  /p:CollectCoverage=true /p:CoverletOutput=lcov/ /p:CoverletOutputFormat=lcov
+        run: dotnet test --no-restore --verbosity normal tests/UnitTests  /p:CollectCoverage=true /p:CoverletOutput=lcov/ /p:CoverletOutputFormat=lcov
 
       - uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: /tests/UnitTests/lcov/coverage.info
+          path-to-lcov: tests/UnitTests/lcov/coverage.info
           base-path:
           flag-name: Unit
